@@ -1,1 +1,1 @@
-# T-B-sumup
+# Tim & Bastien - sumup
