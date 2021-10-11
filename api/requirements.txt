@@ -1,0 +1,8 @@
+peewee
+requests
+flask
+unidecode
+python-dateutil
+flask-cors
+python-dotenv
+redis
