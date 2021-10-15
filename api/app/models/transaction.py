@@ -9,3 +9,4 @@ class Transaction(BaseModel):
     payment_type = CharField()
     time = DateTimeField()
     products = TextField()
+    status = CharField()

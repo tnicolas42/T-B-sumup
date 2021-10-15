@@ -24,9 +24,11 @@ redis = StrictRedis(host='localhost', port=6379, db=0, decode_responses=True)
 ##### APPLICATION CONFIG #####
 from app.routes.connect import connect_bp
 from app.routes.transactions import transactions_bp
+from app.routes.stats import stats_bp
 
 application.register_blueprint(connect_bp)
 application.register_blueprint(transactions_bp)
+application.register_blueprint(stats_bp)
 
 ##### DATABASE CONFIG #####
 from app.models.transaction import Transaction

@@ -10,6 +10,8 @@ def add_transaction(headers, transaction_code):
     base_url = 'https://api.sumup.com/v0.1/me/transactions?'
     params = f'transaction_code={transaction_code}'
     response = requests.get(f"{base_url}{params}", headers=headers)
+    if response.status_code != 200:
+        return False, response.text
     res = response.json()
 
     products = {}
@@ -52,7 +54,9 @@ def add_transaction(headers, transaction_code):
         payment_type=payment_type,
         time=dateutil.parser.parse(res["local_time"]),
         products=str(products),
+        status=res["simple_status"],
     )
+    return True, 'OK'
 
 def get_all_sumup_transactions(headers, start_time=None, end_time=None):
     limits = 1000
@@ -65,6 +69,8 @@ def get_all_sumup_transactions(headers, start_time=None, end_time=None):
     items = []
     while True:
         response = requests.get(f"{base_url}{params}", headers=headers)
+        if response.status_code != 200:
+            return False, response.text
         res = response.json()
         items.extend(res["items"])
         next = res.get("links")
@@ -76,4 +82,7 @@ def get_all_sumup_transactions(headers, start_time=None, end_time=None):
     for it in items:
         transactions = Transaction.select().where(Transaction.transaction_code == it["transaction_code"])
         if len(list(transactions)) == 0:
-            add_transaction(headers, it['transaction_code'])
+            ok, content = add_transaction(headers, it['transaction_code'])
+            if not ok:
+                return ok, content
+    return True, 'OK'

@@ -6,3 +6,4 @@ python-dateutil
 flask-cors
 python-dotenv
 redis
+pandas

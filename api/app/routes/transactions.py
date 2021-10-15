@@ -27,7 +27,9 @@ def fetch_all_transactions():
         'Authorization': 'Bearer {}'.format(access_token)
     }
     
-    get_all_sumup_transactions(headers)
+    ok, content = get_all_sumup_transactions(headers)
+    if not ok:
+        return content
 
     print("new transactions saved in database")
 
