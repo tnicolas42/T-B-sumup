@@ -30,15 +30,21 @@ def stats_week(week: str):
     week_start = datetime.datetime.strptime(week, '%d/%m/%Y')
     week_end = week_start + datetime.timedelta(days=7)
 
-    result = {}
+    result = {
+        'total_brut': 0,
+        'total_net': 0,
+        'payment_type': {},
+    }
     for payment_type in PAYMENT_TYPES:
         query = Transaction.select().where(Transaction.time > week_start, Transaction.time < week_end, Transaction.payment_type == payment_type)
         if len(query) == 0:
             continue
         tot = get_total_from_query(query)
-        result[payment_type] = {
+        result['payment_type'][payment_type] = {
             'total_brut': tot['total_brut'],
             'total_net': tot['total_net'],
         }
+        result['total_brut'] += tot['total_brut']
+        result['total_net'] += tot['total_net']
 
     return result
