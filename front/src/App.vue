@@ -1,11 +1,18 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
-  </div>
+	<fragment>
+		<div id="top">
+			<h1> Tim & Bastien</h1>
+			<img src='@/assets/logoV4_white_light.png' width="80vw" height="80vw"/>
+		</div>
+		<div id="app">
+			<div id="nav">
+				<router-link to="/">Home</router-link> |
+				<router-link to="/produits_sem">Produits / semaines</router-link> |
+				<router-link to="/about">About</router-link>
+			</div>
+			<router-view/>
+		</div>
+	</fragment>
 </template>
 
 <script>
@@ -26,7 +33,7 @@ export default ({
 }
 
 #nav {
-  padding: 30px;
+  padding-bottom: 10px;
 }
 
 #nav a {
@@ -37,4 +44,15 @@ export default ({
 #nav a.router-link-exact-active {
   color: #42b983;
 }
+
+#top {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+#top>h1 {
+	text-align: center;
+}
+
 </style>
