@@ -22,6 +22,8 @@ def fetch_all_transactions():
         "code": sumup_code
     }
     response = requests.post("https://api.sumup.com/token", data=d)
+    if response.status_code != 200:
+        return response.text, 500
     access_token = response.json()["access_token"]
     headers = {
         'Authorization': 'Bearer {}'.format(access_token)
@@ -29,15 +31,11 @@ def fetch_all_transactions():
     
     ok, content = get_all_sumup_transactions(headers)
     if not ok:
-        return content
+        return content, 500
 
     print("new transactions saved in database")
 
-    redirect_url = redis.get('redirect_url')
-    if redirect_url == '':
-        redirect_url = '127.0.0.1:5000'
-    print("redirecting to: " + redirect_url)
-    return redirect(redirect_url)
+    return "All data fetched", 200
 
 @transactions_bp.route("/transactions/size", methods=["GET"])
 def get_nb_transactions():

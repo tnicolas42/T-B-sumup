@@ -35,4 +35,15 @@ def get_client_id():
 @connect_bp.route("/callback")
 def callback():
     sumup_code = request.args.get("code")
-    return redirect(url_for("transactions.fetch_all_transactions", sumup_code=sumup_code))
+
+    redirect_url = redis.get('redirect_url')
+    if redirect_url == '':
+        redirect_url = '127.0.0.1:5000'
+    if '?' in redirect_url:
+        redirect_url += "&"
+    else:
+        redirect_url += "?"
+    redirect_url += "sumup_code=" + sumup_code
+    print("redirecting to: " + redirect_url)
+    return redirect(redirect_url)
+    # return redirect(url_for("transactions.fetch_all_transactions", sumup_code=sumup_code))
