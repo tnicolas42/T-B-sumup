@@ -1,18 +1,18 @@
 <template>
   <div id="flex-container">
-		<fletch-box/>
+		<fetch-box/>
     <p>Nb transactions: {{ nb_transactions }}</p>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
-import FletchBox from '../components/FecthBox.vue'
+import FetchBox from '../components/FecthBox.vue'
 
 export default {
   name: 'Home',
   components: {
-		FletchBox
+		FetchBox
   },
   data () {
     return {

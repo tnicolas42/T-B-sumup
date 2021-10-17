@@ -17,10 +17,10 @@ const routes = [
     component: ProduitsSem
   },
   {
-    path: '/about',
-    name: 'About',
-    component: () => import('../views/About.vue')
-  }
+    path: '/stats_date',
+    name: 'Stats',
+    component: () => import('../views/StatsDate.vue')
+  },
 ]
 
 const router = new VueRouter({

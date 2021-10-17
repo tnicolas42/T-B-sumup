@@ -41,3 +41,9 @@ def fetch_all_transactions():
 def get_nb_transactions():
     query = Transaction.select()
     return { 'size': len(query) }
+
+@transactions_bp.route("/transactions/get/last", methods=["GET"])
+def get_last_transaction():
+    query = Transaction.select().order_by(-Transaction.time).first()
+
+    return query.to_dict()

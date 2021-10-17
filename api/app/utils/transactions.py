@@ -1,3 +1,4 @@
+import json
 import requests
 import unidecode
 import dateutil.parser
@@ -53,7 +54,7 @@ def add_transaction(headers, transaction_code):
         amount_net=amount_net,
         payment_type=payment_type,
         time=dateutil.parser.parse(res["local_time"]),
-        products=str(products),
+        products=json.dumps(products),
         status=res["simple_status"],
     )
     return True, 'OK'
@@ -79,7 +80,9 @@ def get_all_sumup_transactions(headers, start_time=None, end_time=None):
         else:
             break
 
-    for it in items:
+    for idx, it in enumerate(items):
+        if idx % 10 == 0:
+            print('[%3d%%] %d/%d' % (int(float(idx) / len(items) * 100), idx, len(items)))
         transactions = Transaction.select().where(Transaction.transaction_code == it["transaction_code"])
         if len(list(transactions)) == 0:
             ok, content = add_transaction(headers, it['transaction_code'])

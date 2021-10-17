@@ -2,9 +2,10 @@ import pandas as pd
 import datetime
 
 from flask import Blueprint
+from flask import request
 from app.models.transaction import Transaction
 from app import PAYMENT_TYPES
-from app.utils.stats import get_total_from_query
+from app.utils.stats import get_total_from_query, get_stats_from_query
 
 stats_bp = Blueprint("stats", __name__)
 
@@ -46,5 +47,31 @@ def stats_week(week: str):
         }
         result['total_brut'] += tot['total_brut']
         result['total_net'] += tot['total_net']
+
+    return result
+
+@stats_bp.route("/stats/interval", methods=["GET"])
+def stats_interval():
+    """
+    ?start_date=20_09_2021 <- date included
+    ?end_date=20_09_2021 <- date included
+    no data for all stats
+    """
+    # getting starting date
+    start_date = request.args.get('start_date')
+    if start_date is None:
+        start_date = datetime.datetime.strptime('01/01/2021', '%d/%m/%Y')
+    else:
+        start_date = datetime.datetime.strptime(start_date.replace('_', '/'), '%d/%m/%Y')
+
+    # getting ending date
+    end_date = request.args.get('end_date')
+    if end_date is None:
+        end_date = datetime.datetime.now()
+    else:
+        end_date = datetime.datetime.strptime(end_date.replace('_', '/'), '%d/%m/%Y') + datetime.timedelta(days=1)
+
+    query = Transaction.select().where(Transaction.time > start_date, Transaction.time < end_date)
+    result = get_stats_from_query(query=query)
 
     return result

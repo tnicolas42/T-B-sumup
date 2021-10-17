@@ -8,7 +8,7 @@
 			<div id="nav">
 				<router-link to="/">Home</router-link> |
 				<router-link to="/produits_sem">Produits / semaines</router-link> |
-				<router-link to="/about">About</router-link>
+				<router-link to="/stats_date">Stats</router-link>
 			</div>
 			<router-view/>
 		</div>

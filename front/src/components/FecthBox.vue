@@ -11,7 +11,7 @@
 import axios from 'axios'
 
 export default {
-	name: 'FletchBox',
+	name: 'FetchBox',
 	data () {
 		return {
 			fetching_data: {
@@ -43,7 +43,7 @@ export default {
       console.log("fetch new data");
       var connect_url = null;
       axios
-        .get(this.$store.state.api_url + '/set_redirect_url?url=http://127.0.0.1:8080')
+        .get(this.$store.state.api_url + '/set_redirect_url?url=' + window.location.href)
         .then(() => {
           axios
             .get(this.$store.state.api_url + '/get_connect_url')
@@ -63,6 +63,7 @@ export default {
 	display: flex;
 	flex-direction: row;
 	justify-content: center;
+	margin-bottom: 10px;
 }
 
 #fetching-block>div {

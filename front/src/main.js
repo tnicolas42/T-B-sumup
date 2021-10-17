@@ -5,11 +5,12 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import Fragment from 'vue-fragment'
-
+import Datepicker from 'vuejs-datepicker'
 
 Vue.config.productionTip = false
 
 Vue.use(Fragment.Plugin)
+Vue.use(Datepicker)
 
 new Vue({
   router,
