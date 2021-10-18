@@ -43,3 +43,5 @@ create_tables()
 
 ##### REDIS CONFIG #####
 redis.set('redirect_url', '')
+redis.set('header_sumup', '')
+redis.set('sumup_token_info', '')

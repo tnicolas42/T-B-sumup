@@ -1,7 +1,17 @@
 <template>
 	<div id="fetching-block">
 		<div>
-			<button v-on:click="fetch_data">Fetch new data</button>
+			<div id="auto_fetching">
+				<input type="checkbox" v-model="auto_fetching"/>
+				<p>Auto fetching</p>
+			</div>
+
+			<div v-if="$store.state.is_connected">
+				<button v-on:click="fetch_data">Fetch new data</button>
+			</div>
+			<div v-else>
+				<p>Connect before fetch data</p>
+			</div>
 			<p :key="fetching_data.fetch_status">{{ fetching_data.fetch_status }}</p>
 		</div>
 	</div>
@@ -16,42 +26,45 @@ export default {
 		return {
 			fetching_data: {
 				fetch_status: "No fetching"
-			}
+			},
+			auto_fetching: true,
+			interval: null,
 		}
 	},
 	mounted () {
-		if (this.$route.query.sumup_code) {
-			console.log("fetching data...")
+		this.interval = setInterval(this.recurentCallback, this.$store.state.fetching_interval);
+		this.recurentCallback();
+	},
+	destroyed() {
+    clearInterval(this.interval);
+  },
+  methods: {
+		recurentCallback: function () {
+			if (this.$store.state.is_connected && this.auto_fetching) {
+				this.fetch_data()
+			}
+		},
+    fetch_data: function() {
+      console.log("fetching data...")
 			this.fetching_data.fetch_status = "Fetching..."
 			axios
-				.get(this.$store.state.api_url + '/transactions/fetch_all?sumup_code=' + this.$route.query.sumup_code)
+				.get(this.$store.state.api_url + '/transactions/fetch_all')
 				.then(() => {
 					this.fetching_data.fetch_status = "Fetching OK"
 				})
 				.catch(error => {
-					this.fetching_data.fetch_status = "Fetching ERROR"
+					if (error.response.status == 401) {
+						this.fetching_data.fetch_status = "Fetching ERROR (not connected)"
+					}
+					else {
+						this.fetching_data.fetch_status = "Fetching ERROR"
+					}
 					if (error.response) {
 						console.log("error in /transactions/fetch_all\n"
 							+ error.response.status + '\n'
 							+ error.response.data)
 					}
 				})
-		}
-	},
-  methods: {
-    fetch_data: function() {
-      console.log("fetch new data");
-      var connect_url = null;
-      axios
-        .get(this.$store.state.api_url + '/set_redirect_url?url=' + window.location.href)
-        .then(() => {
-          axios
-            .get(this.$store.state.api_url + '/get_connect_url')
-            .then(response => {
-                connect_url = response.data
-                window.location.href = connect_url
-              })
-          })
     }
   },
 }
@@ -72,5 +85,15 @@ export default {
 	padding-bottom: 0px;
 	padding-left: 15px;
 	padding-right: 15px;
+}
+
+#auto_fetching {
+	display: flex;
+	flex-direction: row;
+}
+#auto_fetching>p {
+	margin-top: 0px;
+	margin-bottom: 0px;
+	margin-left: 5px;
 }
 </style>

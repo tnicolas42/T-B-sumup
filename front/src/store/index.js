@@ -7,8 +7,14 @@ export default new Vuex.Store({
   state: {
 		api_url: 'http://127.0.0.1:5000',
 		float_separator: ',',  // should be , or .
+		is_connected: false,
+		fetching_interval: 5000,
+		connect_interval: 60000,
   },
   mutations: {
+		setIsConnected(state, payload) {
+			state.is_connected = payload
+		}
   },
   actions: {
   },

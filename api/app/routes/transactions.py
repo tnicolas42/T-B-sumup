@@ -1,4 +1,6 @@
-import requests
+import datetime
+import dateutil
+import json
 
 from flask import Blueprint
 from flask import request
@@ -13,23 +15,17 @@ transactions_bp = Blueprint("transactions", __name__)
 @transactions_bp.route("/transactions/fetch_all")
 def fetch_all_transactions():
     print("fetching all new data...")
-    sumup_code = request.args.get("sumup_code")
-
-    d = {
-        "grant_type": "authorization_code",
-        "client_id": CLIENT_ID,
-        "client_secret": CLIENT_SECRET,
-        "code": sumup_code
-    }
-    response = requests.post("https://api.sumup.com/token", data=d)
-    if response.status_code != 200:
-        return response.text, 500
-    access_token = response.json()["access_token"]
-    headers = {
-        'Authorization': 'Bearer {}'.format(access_token)
-    }
     
-    ok, content = get_all_sumup_transactions(headers)
+    # get last transaction time
+    query = Transaction.select().order_by(-Transaction.time).first()
+    start_time = None
+    if query is not None:
+        start_time = (dateutil.parser.parse(query.time) + datetime.timedelta(seconds=1)).strftime("%Y-%m-%dT%H:%M:%S.0")
+
+    header = redis.get('header_sumup')
+    if header == '':
+        return "You are not connected", 401
+    ok, content = get_all_sumup_transactions(json.loads(redis.get('header_sumup')), start_time=start_time)
     if not ok:
         return content, 500
 
@@ -45,5 +41,8 @@ def get_nb_transactions():
 @transactions_bp.route("/transactions/get/last", methods=["GET"])
 def get_last_transaction():
     query = Transaction.select().order_by(-Transaction.time).first()
+
+    if query is None:
+        return {}
 
     return query.to_dict()

@@ -1,5 +1,6 @@
 import json
 import requests
+import datetime
 import unidecode
 import dateutil.parser
 
@@ -53,7 +54,7 @@ def add_transaction(headers, transaction_code):
         amount_brut=res["amount"],
         amount_net=amount_net,
         payment_type=payment_type,
-        time=dateutil.parser.parse(res["local_time"]),
+        time=dateutil.parser.parse(res["local_time"]) + datetime.timedelta(hours=2),
         products=json.dumps(products),
         status=res["simple_status"],
     )
@@ -62,7 +63,7 @@ def add_transaction(headers, transaction_code):
 def get_all_sumup_transactions(headers, start_time=None, end_time=None):
     limits = 1000
     base_url = "https://api.sumup.com/v0.1/me/transactions/history?"
-    params = f"order=descending&statuses[]=SUCCESSFUL&limits={limits}"
+    params = f"order=ascending&statuses[]=SUCCESSFUL&limits={limits}"
     if start_time is not None:
         params += '&oldest_time=' + start_time
     if end_time is not None:

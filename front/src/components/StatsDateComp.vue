@@ -25,24 +25,46 @@
 		</div>
 
 		<template v-if="stats">
-			<table>
+			<table id="titleTable">
 				<tr>
-					<td>Nb transactions</td>
-					<td>{{ stats.nb_transactions }}</td>
-				</tr>
-				<tr>
-					<td>Nb repas</td>
-					<td>{{ stats.nb_repas }}</td>
-				</tr>
-				<tr>
-					<td>Total brut</td>
-					<td>{{ stats.total_brut }}</td>
-				</tr>
-				<tr>
-					<td>Total net</td>
-					<td>{{ stats.total_net }}</td>
+					<td>Stats beetween <b>{{ start_date.toLocaleDateString("fr-FR") }}</b> and <b>{{ end_date.toLocaleDateString("fr-FR") }}</b></td>
 				</tr>
 			</table>
+			<div id="topTable">
+				<table>
+					<tr>
+						<td>Nb transactions</td>
+						<td>{{ stats.nb_transactions }}</td>
+					</tr>
+					<tr>
+						<td>Total brut</td>
+						<td>{{ stats.total_brut }}</td>
+					</tr>
+					<tr>
+						<td>Total net</td>
+						<td>{{ stats.total_net }}</td>
+					</tr>
+				</table>
+
+				<table>
+					<tr>
+						<td>Nb repas</td>
+						<td>{{ stats.nb_repas }}</td>
+					</tr>
+					<tr>
+						<td>Nb café</td>
+						<td>{{ stats.nb_cafe }}</td>
+					</tr>
+					<tr>
+						<td>Nb cookies</td>
+						<td>{{ stats.nb_cookie }}</td>
+					</tr>
+					<tr>
+						<td>Nb jus</td>
+						<td>{{ stats.nb_jus }}</td>
+					</tr>
+				</table>
+			</div>
 
 			<hr/>
 			<template v-if="Object.keys(stats.categories).length > 0">
@@ -109,8 +131,8 @@ export default {
 	},
 	methods: {
 		stats_interval: function() {
-			let start = 'start_date=' + this.start_date.toLocaleDateString('fr-FR').replace("/", "_")
-			let end = 'end_date=' + this.end_date.toLocaleDateString('fr-FR').replace("/", "_")
+			let start = 'start_date=' + this.start_date.toLocaleDateString('fr-FR').replaceAll("/", "_")
+			let end = 'end_date=' + this.end_date.toLocaleDateString('fr-FR').replaceAll("/", "_")
 			let url = ''
 			if (this.start_date_check) {
 				url += '?' + start
@@ -141,9 +163,14 @@ export default {
 			axios
 				.get(this.$store.state.api_url + '/transactions/get/last')
 				.then(response => {
-					this.last_transaction = response.data
-					this.last_transaction.amount_brut = to_euro(this.last_transaction.amount_brut)
-					this.last_transaction.amount_net = to_euro(this.last_transaction.amount_net)
+					if (Object.keys(response.data).length > 0) {
+						this.last_transaction = response.data
+						this.last_transaction.amount_brut = to_euro(this.last_transaction.amount_brut)
+						this.last_transaction.amount_net = to_euro(this.last_transaction.amount_net)
+					}
+					else {
+						this.last_transaction = null
+					}
 				})
 				.catch(error => {
 					if (error.response) {
@@ -179,5 +206,20 @@ export default {
 #dateBox>div {
 	display: flex;
 	flex-direction: row;
+}
+
+#titleTable {
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+#topTable {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+}
+
+#topTable>table {
+	margin: 10px;
 }
 </style>
