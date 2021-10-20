@@ -97,11 +97,5 @@ def callback():
     redirect_url = redis.get('redirect_url')
     if redirect_url == '':
         redirect_url = '127.0.0.1:5000'
-    if '?' in redirect_url:
-        redirect_url += "&"
-    else:
-        redirect_url += "?"
-    # redirect_url += "sumup_code=" + sumup_code
-    redirect_url += "fetch_data=true"
     print("redirecting to: " + redirect_url)
     return redirect(redirect_url)

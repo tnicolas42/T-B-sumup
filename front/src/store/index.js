@@ -9,7 +9,7 @@ export default new Vuex.Store({
 		float_separator: ',',  // should be , or .
 		is_connected: false,
 		fetching_interval: 5000,
-		connect_interval: 60000,
+		connect_interval: 10000,
   },
   mutations: {
 		setIsConnected(state, payload) {

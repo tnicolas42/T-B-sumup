@@ -1,7 +1,7 @@
 <template>
 	<div id="fetching-block">
 		<div>
-			<div id="auto_fetching">
+			<div id="auto_fetching" v-if="$store.state.is_connected">
 				<input type="checkbox" v-model="auto_fetching"/>
 				<p>Auto fetching</p>
 			</div>
