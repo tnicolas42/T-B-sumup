@@ -55,7 +55,7 @@ export default ({
           axios
             .get(this.$store.state.api_url + '/get_connect_url')
             .then(response => {
-                connect_url = response.data
+								connect_url = response.data
                 window.location.href = connect_url
               })
           })

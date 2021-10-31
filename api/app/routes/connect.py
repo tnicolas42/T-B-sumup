@@ -22,7 +22,7 @@ def connect():
 
 @connect_bp.route("/get_connect_url")
 def get_connect_url():
-    url = f"https://api.sumup.com/authorize?response_type=code&client_id={CLIENT_ID}&redirect_uri=http://127.0.0.1:5000/callback&scope=payments"
+    url = f"https://api.sumup.com/authorize?response_type=code&client_id={CLIENT_ID}&redirect_uri=http://127.0.0.1:5000/callback"
     return url, 200
 
 @connect_bp.route("/set_redirect_url")

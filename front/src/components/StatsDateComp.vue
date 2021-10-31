@@ -18,6 +18,10 @@
 						:monday-first=true
 					/>
 				</div>
+				<div id="auto_update" v-if="$store.state.is_connected">
+					<input type="checkbox" v-model="auto_update"/>
+					<p>Auto update</p>
+				</div>
 				<button v-on:click="stats_interval">Validate</button>
 			</div>
 
@@ -124,13 +128,23 @@ export default {
 			end_date: new Date(),
 			stats: null,
 			last_transaction: null,
+			auto_update: true,
+			interval: null,
     }
   },
 	mounted() {
 		this.stats_interval()
+		this.interval = setInterval(this.recurentCallback, this.$store.state.fetching_interval);
+		this.recurentCallback();
 	},
 	methods: {
+		recurentCallback: function () {
+			if (this.$store.state.is_connected && this.auto_update) {
+				this.stats_interval()
+			}
+		},
 		stats_interval: function() {
+			console.log("update data table")
 			let start = 'start_date=' + this.start_date.toLocaleDateString('fr-FR').replaceAll("/", "_")
 			let end = 'end_date=' + this.end_date.toLocaleDateString('fr-FR').replaceAll("/", "_")
 			let url = ''
@@ -207,6 +221,17 @@ export default {
 	display: flex;
 	flex-direction: row;
 }
+
+#auto_update {
+	display: flex;
+	flex-direction: row;
+}
+#auto_update>p {
+	margin-top: 0px;
+	margin-bottom: 0px;
+	margin-left: 5px;
+}
+
 
 #titleTable {
 	margin-left: 10px;
