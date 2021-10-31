@@ -2,6 +2,10 @@
 	<fragment>
 		<div id='topBox'>
 			<div id='dateBox'>
+				<div id="auto_update" v-if="$store.state.is_connected">
+					<input type="checkbox" v-model="auto_update"/>
+					<p>Auto update</p>
+				</div>
 				<div>
 					<input type="checkbox" v-model="start_date_check"/>
 					<Datepicker
@@ -17,10 +21,6 @@
 						:value="end_date"
 						:monday-first=true
 					/>
-				</div>
-				<div id="auto_update" v-if="$store.state.is_connected">
-					<input type="checkbox" v-model="auto_update"/>
-					<p>Auto update</p>
 				</div>
 				<button v-on:click="stats_interval">Validate</button>
 			</div>
