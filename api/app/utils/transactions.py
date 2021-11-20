@@ -8,6 +8,10 @@ from app import PAYMENT_TYPES, PAYMENT_COMMISSION
 from app.models.transaction import Transaction
 
 
+def get_transaction_time(transaction_json):
+    return dateutil.parser.parse(transaction_json["local_time"])
+    # return dateutil.parser.parse(transaction_json["local_time"]) + datetime.timedelta(hours=2)
+
 def add_transaction(headers, transaction_code):
     base_url = 'https://api.sumup.com/v0.1/me/transactions?'
     params = f'transaction_code={transaction_code}'
@@ -49,12 +53,12 @@ def add_transaction(headers, transaction_code):
     amount_net = res["amount"] * (1 - (PAYMENT_COMMISSION[payment_type] / 100))
 
     Transaction.create(
-        id=res["internal_id"],
+        # id=res["internal_id"],
         transaction_code=res["transaction_code"],
         amount_brut=res["amount"],
         amount_net=amount_net,
         payment_type=payment_type,
-        time=dateutil.parser.parse(res["local_time"]) + datetime.timedelta(hours=2),
+        time=get_transaction_time(res),
         products=json.dumps(products),
         status=res["simple_status"],
     )

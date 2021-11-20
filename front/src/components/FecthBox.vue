@@ -45,26 +45,28 @@ export default {
 			}
 		},
     fetch_data: function() {
-      console.log("fetching data...")
-			this.fetching_data.fetch_status = "Fetching..."
-			axios
-				.get(this.$store.state.api_url + '/transactions/fetch_all')
-				.then(() => {
-					this.fetching_data.fetch_status = "Fetching OK"
-				})
-				.catch(error => {
-					if (error.response.status == 401) {
-						this.fetching_data.fetch_status = "Fetching ERROR (not connected)"
-					}
-					else {
-						this.fetching_data.fetch_status = "Fetching ERROR"
-					}
-					if (error.response) {
-						console.log("error in /transactions/fetch_all\n"
-							+ error.response.status + '\n'
-							+ error.response.data)
-					}
-				})
+			if (this.fetching_data.fetch_status != "Fetching...") {
+				console.log("fetching data...")
+				this.fetching_data.fetch_status = "Fetching..."
+				axios
+					.get(this.$store.state.api_url + '/transactions/fetch_all')
+					.then(() => {
+						this.fetching_data.fetch_status = "Fetching OK"
+					})
+					.catch(error => {
+						if (error.response.status == 401) {
+							this.fetching_data.fetch_status = "Fetching ERROR (not connected)"
+						}
+						else {
+							this.fetching_data.fetch_status = "Fetching ERROR"
+						}
+						if (error.response) {
+							console.log("error in /transactions/fetch_all\n"
+								+ error.response.status + '\n'
+								+ error.response.data)
+						}
+					})
+			}
     }
   },
 }

@@ -44,6 +44,8 @@ def reconnect():
             "code": token_info['code'],
             "refresh_token": token_info['refresh_token'],
         }
+        redis.set('sumup_token_info', '')
+        redis.set('header_sumup', '')
         response = requests.post("https://api.sumup.com/token", data=d)
         if response.status_code != 200:
             return response.text, 500
@@ -65,7 +67,7 @@ def is_connected():
         if expires - datetime.timedelta(minutes=10) < datetime.datetime.now():
             redirect('reconnect')
 
-        if json.loads(redis.get('header_sumup')):
+        if json.loads(redis.get('header_sumup')) != '':
             return { 'connected': True }, 200
     return { 'connected': False }, 200
     

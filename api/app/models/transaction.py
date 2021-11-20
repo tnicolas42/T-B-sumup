@@ -3,7 +3,7 @@ from peewee import CharField, FloatField, PrimaryKeyField, TextField, DateTimeFi
 from playhouse.shortcuts import model_to_dict
 
 class Transaction(BaseModel):
-    id = PrimaryKeyField()
+    # id = PrimaryKeyField()
     transaction_code = CharField()
     amount_brut = FloatField()
     amount_net = FloatField()
