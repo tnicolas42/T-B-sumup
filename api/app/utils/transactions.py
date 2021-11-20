@@ -22,6 +22,10 @@ def add_transaction(headers, transaction_code):
 
     products = {}
 
+    ############ resolving API bug...
+    if res['transaction_code'] == "TEQK33DADK":
+        res['product_summary'] = "1 x Jus, 2 x Café cookie, 4 x Cookie, 18 x Repas, 2 x Repas sans contenant"
+
     prod = res['product_summary']
     prod = prod.split(',')
     for p in prod:
