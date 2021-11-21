@@ -132,3 +132,6 @@ dmypy.json
 .DS_Store
 api/venv/
 venv
+
+api/token.json
+api/credentials.json
