@@ -92,7 +92,6 @@ class GoogleSheetsApi:
         ranges = []
         for single_range in cells:
             ranges.append(sheet_name + '!' + single_range)
-        print(ranges)
         sheet = self.service.spreadsheets()
         result = sheet.values().batchGet(spreadsheetId=file_id,
                                     ranges=ranges,
@@ -101,9 +100,6 @@ class GoogleSheetsApi:
                                     dateTimeRenderOption=date_time_render_option,
                                     ).execute()
         # return a list of ValueRange https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values#ValueRange
-        # print(result)
-        # print(type(result))
-        # values = result.get('values', [])
         values = []
         for res in result['valueRanges']:
             values.append(res['values'])

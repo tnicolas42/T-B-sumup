@@ -8,6 +8,9 @@ compte_bp = Blueprint("compte", __name__)
 
 @compte_bp.route("/compte/charges", methods=["GET"])
 def get_charges():
+    """
+    Get the total charges of the project
+    """
     total_charges = gsheet.get_cell('M4', **TBCOMPTE.CHARGES)
     return {
         'charges': total_charges,
@@ -16,6 +19,9 @@ def get_charges():
 
 @compte_bp.route("/compte/produits", methods=["GET"])
 def get_produits():
+    """
+    Get the total and received product
+    """
     result = gsheet.batch_get_cell(['L4', 'L7'], **TBCOMPTE.PRODUITS)
     total_produits = result[0]
     recu = result[1]
