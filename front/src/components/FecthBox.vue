@@ -27,7 +27,7 @@ export default {
 			fetching_data: {
 				fetch_status: "No fetching"
 			},
-			auto_fetching: true,
+			auto_fetching: false,
 			interval: null,
 		}
 	},
