@@ -179,7 +179,12 @@ class GoogleSheetsApi:
         return values
 
 
-    def get_cell(self, cell, file_id, sheet_name):
+    def get_cell(self,
+        cell,
+        file_id,
+        sheet_name,
+        value_render_option=VALUE_RENDER_OPTION.DEFAULT,
+        date_time_render_option=DATE_TIME_RENDER_OPTION.DEFAULT):
         """
         Read values in a specified range
 
@@ -187,11 +192,19 @@ class GoogleSheetsApi:
             cell (str): The cell (eg. 'A1').
             file_id (str): The spreadseet id.
             sheet_name (str): The sheetname in the spreadsheet.
+            value_render_option (str): How values should be represented in the output.
+            date_time_render_option (str): How dates, times, and durations should be represented in the output.
           
         Returns:
             type: The readed value in the right type.
         """
-        return self.get_range(file_id=file_id, sheet_name=sheet_name, cells=cell)[0][0]
+        return self.get_range(
+            file_id=file_id,
+            sheet_name=sheet_name,
+            cells=cell,
+            value_render_option=value_render_option,
+            date_time_render_option=date_time_render_option,
+            )[0][0]
 
 
     def batch_update_range(self, cells, values, file_id, sheet_name, value_input_option=VALUE_INPUT_OPTION.DEFAULT, major_dimension=MAJOR_DIMENSION.DEFAULT):
