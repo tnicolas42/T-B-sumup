@@ -3,11 +3,14 @@ import datetime
 
 from flask import Blueprint
 from flask import request
+from flask_cors import CORS
+
 from app.models.transaction import Transaction
 from app import PAYMENT_TYPES
 from app.utils.stats import get_total_from_query, get_stats_from_query
 
 stats_bp = Blueprint("stats", __name__)
+CORS(stats_bp)
 
 @stats_bp.route("/stats/total", methods=["GET"])
 def total_brut():

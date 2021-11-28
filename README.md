@@ -19,3 +19,9 @@ Go to [sumup](https://me.sumup.com/dashboard) and open `Developeur` section (cli
 In `OAuth` section, download the `Export` file.
 
 In the json downloaded file, copy the client_id and client_secret in the `api/.env` file
+
+## ERRORS
+
+### CORS
+If the frontend console tells `Blocked by CORS policy: No ‘Access-Control-Allow-Origin’`:
+- Install and enable the chrome extension `CORS unblock`

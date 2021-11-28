@@ -38,10 +38,24 @@ class TBCOMPTE:
     )
 
 ##### STARTING ALL #####
+import logging
 database = SqliteDatabase(database="db_sumup.db")
 
+# cors = CORS()
+
 application = Flask(__name__)
-CORS(application)
+# cors.init_app(application)
+# CORS(application)
+CORS(
+    application,
+    allow_headers="*",
+    origins="*",
+    headers="*",
+    expose_headers="*",
+    supports_credentials=True,
+)
+
+logging.getLogger('flask_cors').level = logging.DEBUG
 
 redis = StrictRedis(host='localhost', port=6379, db=0, decode_responses=True)
 

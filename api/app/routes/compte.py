@@ -1,10 +1,12 @@
 from flask import Blueprint
 from flask import request
+from flask_cors import CORS
 
 from app import gsheet, TBCOMPTE
 from app.utils.google_sheets_api import MAJOR_DIMENSION, VALUE_RENDER_OPTION, DATE_TIME_RENDER_OPTION
 
 compte_bp = Blueprint("compte", __name__)
+CORS(compte_bp)
 
 @compte_bp.route("/compte/charges", methods=["GET"])
 def get_charges():

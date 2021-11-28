@@ -4,10 +4,12 @@ import json
 
 from flask import Blueprint
 from flask import redirect, request, url_for
+from flask_cors import CORS
 
 from app import CLIENT_ID, CLIENT_SECRET, redis
 
 connect_bp = Blueprint("connect", __name__)
+CORS(connect_bp)
 
 redirect_url = None
 

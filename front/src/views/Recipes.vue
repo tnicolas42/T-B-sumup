@@ -1,7 +1,8 @@
 <template>
   <div>
-    <div v-for="(name, id) in recipes" :key="id">
-      <button v-on:click="download_recipe(id, 12)">Telecharger {{ name }}</button>
+    <input v-model="nb_people_recipe" placeholder="edit me" type="number">
+    <div class="recipe_buttons" v-for="(recipe, idx) in recipes" :key="idx">
+      <button v-on:click="download_recipe(recipe.id, nb_people_recipe)">{{ recipe.name }}</button>
     </div>
   </div>
 </template>
@@ -16,19 +17,19 @@ export default {
   data () {
     return {
       recipes: null,
+      nb_people_recipe: 4,
     }
   },
   mounted () {
     axios
       .get(this.$store.state.api_url + '/recipe/list')
       .then(response => {
-        this.recipes = response.data
-        console.log(this.recipes)
+        this.recipes = response.data.data
       })
   },
   methods: {
     download_recipe: function(file_id, nb) {
-      console.log("download recipe")
+      console.log("download recipe for " + nb)
 			axios
         .get(this.$store.state.api_url + "/recipe/download/" + file_id + "/" + nb)
         .then(response => {
@@ -38,3 +39,23 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.recipe_buttons {
+  display: flex;
+  flex-direction: column;
+}
+
+.recipe_buttons>button {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 12px;
+  margin: 2px;
+}
+</style>

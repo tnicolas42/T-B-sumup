@@ -1,9 +1,11 @@
 from flask import Blueprint
 from flask import redirect
+from flask_cors import CORS
 
 from app import gsheet
 
 recipe_bp = Blueprint("recipe", __name__)
+CORS(recipe_bp)
 
 @recipe_bp.route("/recipe/download/<file_id>/<nb>")
 def download_recipe(file_id, nb):

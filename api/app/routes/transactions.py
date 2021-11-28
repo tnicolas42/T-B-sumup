@@ -3,6 +3,7 @@ import dateutil
 import json
 
 from flask import Blueprint
+from flask_cors import CORS
 from flask import request
 from werkzeug.utils import redirect
 
@@ -11,6 +12,7 @@ from app.models.transaction import Transaction
 from app.utils.transactions import get_all_sumup_transactions
 
 transactions_bp = Blueprint("transactions", __name__)
+CORS(transactions_bp)
 
 @transactions_bp.route("/transactions/fetch_all")
 def fetch_all_transactions():
