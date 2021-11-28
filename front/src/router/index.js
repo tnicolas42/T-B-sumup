@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import ProduitsSem from '../views/ProduitsSem.vue'
+import Recipes from '../views/Recipes.vue'
 
 Vue.use(VueRouter)
 
@@ -20,6 +21,11 @@ const routes = [
     path: '/stats_date',
     name: 'Stats',
     component: () => import('../views/StatsDate.vue')
+  },
+  {
+    path: '/recipes',
+    name: 'Recipes',
+    component: Recipes
   },
 ]
 

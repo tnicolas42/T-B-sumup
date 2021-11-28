@@ -50,11 +50,13 @@ from app.routes.connect import connect_bp
 from app.routes.transactions import transactions_bp
 from app.routes.stats import stats_bp
 from app.routes.compte import compte_bp
+from app.routes.recipe import recipe_bp
 
 application.register_blueprint(connect_bp)
 application.register_blueprint(transactions_bp)
 application.register_blueprint(stats_bp)
 application.register_blueprint(compte_bp)
+application.register_blueprint(recipe_bp)
 
 ##### DATABASE CONFIG #####
 from app.models.transaction import Transaction

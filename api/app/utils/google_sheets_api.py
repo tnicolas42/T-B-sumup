@@ -6,7 +6,10 @@ from google.oauth2.credentials import Credentials
 
 # If modifying these scopes, delete the file token.json.
 # https://developers.google.com/sheets/api/guides/authorizing
-SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+SCOPES = [
+    'https://www.googleapis.com/auth/spreadsheets',
+    'https://www.googleapis.com/auth/drive.metadata.readonly',
+]
 
 class VALUE_INPUT_OPTION:  # https://developers.google.com/sheets/api/reference/rest/v4/ValueInputOption
     RAW = 'RAW'  # The values the user has entered will not be parsed and will be stored as-is.
@@ -30,7 +33,8 @@ class DATE_TIME_RENDER_OPTION:  # https://developers.google.com/sheets/api/refer
     DEFAULT = FORMATTED_STRING  # The default value
 
 class GoogleSheetsApi:
-    service = None  # google sheet api service
+    sheet_service = None  # google sheet api service
+    drive_service = None  # google drive api service
 
     def __init__(self):
         pass
@@ -63,7 +67,8 @@ class GoogleSheetsApi:
             with open('token.json', 'w') as token:
                 token.write(creds.to_json())
 
-        self.service = build('sheets', 'v4', credentials=creds)
+        self.sheet_service = build('sheets', 'v4', credentials=creds)
+        self.drive_service = build('drive', 'v3', credentials=creds)
         return self
 
 
@@ -92,7 +97,7 @@ class GoogleSheetsApi:
         ranges = []
         for single_range in cells:
             ranges.append(sheet_name + '!' + single_range)
-        sheet = self.service.spreadsheets()
+        sheet = self.sheet_service.spreadsheets()
         result = sheet.values().batchGet(spreadsheetId=file_id,
                                     ranges=ranges,
                                     majorDimension=major_dimension,
@@ -163,7 +168,7 @@ class GoogleSheetsApi:
         Returns:
             list: The readed values (eg. [ [ 12, 'ok' ], [ 3, 4 ] ]).
         """
-        sheet = self.service.spreadsheets()
+        sheet = self.sheet_service.spreadsheets()
         result = sheet.values().get(spreadsheetId=file_id,
                                     range=sheet_name + '!' + cells,
                                     majorDimension=major_dimension,
@@ -228,7 +233,7 @@ class GoogleSheetsApi:
                 "majorDimension": major_dimension,
                 "values": values[idx],
             })
-        result = self.service.spreadsheets().values().batchUpdate(
+        result = self.sheet_service.spreadsheets().values().batchUpdate(
             spreadsheetId=file_id,
             body=body).execute()
         return result.get('updatedCells')
@@ -280,7 +285,7 @@ class GoogleSheetsApi:
         body = {
             'values': values
         }
-        result = self.service.spreadsheets().values().update(
+        result = self.sheet_service.spreadsheets().values().update(
             spreadsheetId=file_id,
             range=sheet_name + '!' + cells,
             valueInputOption=value_input_option,
@@ -302,22 +307,34 @@ class GoogleSheetsApi:
         Returns:
             int: The number of cells updated.
         """
-        return self.write_range(file_id=file_id, sheet_name=sheet_name, cells=cell, values=[[value]], value_input_option=value_input_option)
+        return self.update_range(file_id=file_id, sheet_name=sheet_name, cells=cell, values=[[value]], value_input_option=value_input_option)
 
+
+    def list_files(self, folder_id):
+        q = "'" + folder_id + "' in parents"
+        result = self.drive_service.files().list(
+            q = q,
+            pageSize=10, fields="nextPageToken, files(id, name, mimeType)").execute()
+        items = result.get('files', [])
+        return items
 
 if __name__ == '__main__':
     gsheet = GoogleSheetsApi().connect_api()
 
-    file_info = dict(
-        file_id='17BxVhEaZ8KN_nrV2ZM1TgkdT4fpjea2eyS5HRi-yyqA',
-        sheet_name='Sheet1',
-    )
+    items = gsheet.list_files("1xZzpaRoEBS8Tetvb-fFGowtuKNqv8E8d")
+    for it in items:
+        print(it)
 
-    values = gsheet.get_range(cells='A1:B3', **file_info)
-    print(values)
+    # file_info = dict(
+    #     file_id='17BxVhEaZ8KN_nrV2ZM1TgkdT4fpjea2eyS5HRi-yyqA',
+    #     sheet_name='Sheet1',
+    # )
 
-    print(gsheet.get_cell(cell='A2', **file_info))
+    # values = gsheet.get_range(cells='A1:B3', **file_info)
+    # print(values)
 
-    gsheet.update_range(cells='A2:B2', values=[[12, 14]], **file_info)
+    # print(gsheet.get_cell(cell='A2', **file_info))
 
-    gsheet.update_value(cell='C1', value='=12+3', **file_info)
+    # gsheet.update_range(cells='A2:B2', values=[[12, 14]], **file_info)
+
+    # gsheet.update_value(cell='C1', value='=12+3', **file_info)
