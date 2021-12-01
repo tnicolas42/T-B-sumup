@@ -9,6 +9,7 @@ config = dotenv_values(".env")
 
 CLIENT_ID = config["CLIENT_ID"]
 CLIENT_SECRET = config["CLIENT_SECRET"]
+RUNNING_PORT = config["API_PORT"]
 
 PAYMENT_TYPES = { "CASH": "CASH", "CB": "CB", "PMK": "PMK" }
 PAYMENT_COMMISSION = { "CASH": 0, "CB": 1.5, "PMK": 0.7 }

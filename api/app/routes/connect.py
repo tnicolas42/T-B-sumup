@@ -6,7 +6,7 @@ from flask import Blueprint
 from flask import redirect, request, url_for
 from flask_cors import CORS
 
-from app import CLIENT_ID, CLIENT_SECRET, redis
+from app import CLIENT_ID, CLIENT_SECRET, RUNNING_PORT, redis
 
 connect_bp = Blueprint("connect", __name__)
 CORS(connect_bp)
@@ -19,12 +19,12 @@ def main_route():
 
 @connect_bp.route("/connect")
 def connect():
-    url = f"https://api.sumup.com/authorize?response_type=code&client_id={CLIENT_ID}&redirect_uri=http://127.0.0.1:5000/callback&scope=payments user.app-settings transactions.history user.profile_readonly&state=2cFCsY36y95lFHk4"
+    url = f"https://api.sumup.com/authorize?response_type=code&client_id={CLIENT_ID}&redirect_uri=http://127.0.0.1:{RUNNING_PORT}/callback&scope=payments user.app-settings transactions.history user.profile_readonly&state=2cFCsY36y95lFHk4"
     return redirect(url)
 
 @connect_bp.route("/get_connect_url")
 def get_connect_url():
-    url = f"https://api.sumup.com/authorize?response_type=code&client_id={CLIENT_ID}&redirect_uri=http://127.0.0.1:5000/callback"
+    url = f"https://api.sumup.com/authorize?response_type=code&client_id={CLIENT_ID}&redirect_uri=http://127.0.0.1:{RUNNING_PORT}/callback"
     return url, 200
 
 @connect_bp.route("/set_redirect_url")
@@ -100,6 +100,6 @@ def callback():
 
     redirect_url = redis.get('redirect_url')
     if redirect_url == '':
-        redirect_url = '127.0.0.1:5000'
+        redirect_url = f'127.0.0.1:{RUNNING_PORT}'
     print("redirecting to: " + redirect_url)
     return redirect(redirect_url)
