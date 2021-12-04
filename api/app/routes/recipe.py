@@ -1,5 +1,5 @@
 from flask import Blueprint
-from flask import redirect
+from flask import send_file, request
 from flask_cors import CORS
 
 from app import gsheet
@@ -83,10 +83,14 @@ def recipe_list_with_image():
         if it['mimeType'] == 'application/vnd.google-apps.spreadsheet':
             # img = gsheet.get_cell(cell=R.IMG_LINK, file_id=it['id'], sheet_name=R.SHT_NAME.RECETTE)
             # img_path = "assets/recipes/Tranches de potimarron croustillantes et crème aigre.png"
-            img_path = "assets/recipes/tranche.png"
             recipes.append({
                 'id': it['id'],
                 'name': it['name'],
-                'img_path': img_path,
+                'img_url': 'http://127.0.0.1:5001/recipe/image/?name=Tranches de potimarron croustillantes et crème aigre.png',
             })
     return { 'data': recipes }, 200
+
+@recipe_bp.route("/recipe/image/")
+def recipe_get_image():
+    name = request.args.get("name")
+    return send_file(path_or_file='../../assets/recipes/' + name, mimetype='image/gif')
