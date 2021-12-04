@@ -1,9 +1,12 @@
 <template>
   <div>
+    <button v-on:click="update_recipes()">Update recipes</button>
     <input v-model="nb_people_recipe" placeholder="edit me" type="number">
     <div class="recipe_buttons" v-for="(recipe, idx) in recipes" :key="idx">
-      <button v-on:click="download_recipe(recipe.id, nb_people_recipe)">{{ recipe.name }}</button>
-      <img :src=recipe.img_url>
+      <button v-on:click="download_recipe(recipe.id, nb_people_recipe)">
+        {{ recipe.name }}
+        <img :src=recipe.img_url>
+      </button>
     </div>
   </div>
 </template>
@@ -23,9 +26,12 @@ export default {
   },
   mounted () {
     axios
-      .get(this.$store.state.api_url + '/recipe/list_with_image')
+      .get(this.$store.state.api_url + '/recipe/list')
       .then(response => {
         this.recipes = response.data.data
+        for (var i = 0; i < this.recipes.length; i++) {
+          this.recipes[i].img_url = this.$store.state.api_url + '/recipe/image/' + this.recipes[i].id
+        }
       })
   },
   methods: {
@@ -35,6 +41,17 @@ export default {
         .get(this.$store.state.api_url + "/recipe/download/" + file_id + "/" + nb)
         .then(response => {
           window.location.href = response.data
+        })
+    },
+    update_recipes: function () {
+      console.log("update recipes")
+      axios
+        .get(this.$store.state.api_url + '/recipe/fetch')
+        .then(response => {
+          console.log("update recipe: OK")
+        })
+        .catch(error => {
+          console.log("update recipe: ERROR")
         })
     }
   }

@@ -6,8 +6,8 @@ from playhouse.shortcuts import model_to_dict
 class Recipe(BaseModel):
     name = CharField()  # name of the recipe
     file_id = CharField()  # id of the recipe file
-    img_link = CharField()  # google drive link to image
-    img_location = CharField()  # local position of the image
+    img_id = CharField()  # google drive link to image
+    img_path = CharField()  # image path
 
     def to_dict(self, exclude=None, include=None):
         """

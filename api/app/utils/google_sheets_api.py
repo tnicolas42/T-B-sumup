@@ -1,5 +1,7 @@
+import io
 import os.path
 from googleapiclient.discovery import build
+from googleapiclient.http import MediaIoBaseDownload
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -8,7 +10,7 @@ from google.oauth2.credentials import Credentials
 # https://developers.google.com/sheets/api/guides/authorizing
 SCOPES = [
     'https://www.googleapis.com/auth/spreadsheets',
-    'https://www.googleapis.com/auth/drive.metadata.readonly',
+    'https://www.googleapis.com/auth/drive',
 ]
 
 class VALUE_INPUT_OPTION:  # https://developers.google.com/sheets/api/reference/rest/v4/ValueInputOption
@@ -317,6 +319,18 @@ class GoogleSheetsApi:
             pageSize=10, fields="nextPageToken, files(id, name, mimeType)").execute()
         items = result.get('files', [])
         return items
+
+
+    def download_file(self, file_id, dest):
+        request = self.drive_service.files().get_media(fileId=file_id)
+        fh = io.BytesIO()
+        downloader = MediaIoBaseDownload(fh, request)
+        done = False
+        while done is False:
+            status, done = downloader.next_chunk()
+            # print("Download %d%%." % int(status.progress() * 100))
+        with open(dest, 'wb') as f:
+            f.write(fh.getbuffer())
 
 if __name__ == '__main__':
     gsheet = GoogleSheetsApi().connect_api()

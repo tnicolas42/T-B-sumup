@@ -79,6 +79,7 @@ from app.models.recipe import Recipe
 
 def create_tables():
     with database:
+        # database.drop_tables([Recipe])
         database.create_tables([
             Transaction,
             Recipe,

@@ -2,9 +2,10 @@ from flask import Blueprint
 from flask import send_file, request
 from flask_cors import CORS
 
-from app import gsheet
+from app import gsheet, RUNNING_PORT
+from app.models.recipe import Recipe
 
-class Recipe:
+class RecipeInfo:
     NB_PERSONNES    = "H9"
     IMG_LINK        = "D4"
     class SheetName:
@@ -15,7 +16,7 @@ class Recipe:
         RECIPES_FOLDER_ID = "1xZzpaRoEBS8Tetvb-fFGowtuKNqv8E8d"
     LINK = Link()
 
-R = Recipe()
+R = RecipeInfo()
 
 recipe_bp = Blueprint("recipe", __name__)
 CORS(recipe_bp)
@@ -46,6 +47,24 @@ def download_recipe(file_id, nb):
     return url, 200
 
 
+@recipe_bp.route("/recipe/fetch")
+def recipe_fetch():
+    items = gsheet.list_files(R.LINK.RECIPES_FOLDER_ID)
+    Recipe.delete().execute()
+    for it in items:
+        if it['mimeType'] == 'application/vnd.google-apps.spreadsheet':
+            img_link = gsheet.get_cell(cell=R.IMG_LINK, file_id=it['id'], sheet_name=R.SHT_NAME.RECETTE)
+            img_path = 'assets/recipes/' + it['id'] + '.png'
+            gsheet.download_file(file_id=img_link, dest='../' + img_path)
+            Recipe.create(
+                name=it['name'],
+                file_id=it['id'],
+                img_id=img_link,
+                img_path=img_path,
+            )
+    return "OK", 200
+
+
 @recipe_bp.route("/recipe/list")
 def recipe_list():
     """
@@ -56,41 +75,20 @@ def recipe_list():
     Returns:
         list(dict): A list of all recipe and id (eg. [{name: "<nom>", "id": "<id>"}])
     """
-    items = gsheet.list_files(R.LINK.RECIPES_FOLDER_ID)
     recipes = []
-    for it in items:
-        if it['mimeType'] == 'application/vnd.google-apps.spreadsheet':
-            recipes.append({
-                'id': it['id'],
-                'name': it['name'],
-            })
+    query = Recipe.select()
+    for q in query:
+        recipes.append({
+            'id': q.file_id,
+            'name': q.name,
+        })
     return { 'data': recipes }, 200
 
 
-@recipe_bp.route("/recipe/list_with_image")
-def recipe_list_with_image():
-    """
-    Get the list of recipes with coresponding images
-
-    Parameters:
-
-    Returns:
-        list(dict): A list of all recipe and id (eg. [{name: "<nom>", "id": "<id>", "img": "<img>"}])
-    """
-    items = gsheet.list_files(R.LINK.RECIPES_FOLDER_ID)
-    recipes = []
-    for it in items:
-        if it['mimeType'] == 'application/vnd.google-apps.spreadsheet':
-            # img = gsheet.get_cell(cell=R.IMG_LINK, file_id=it['id'], sheet_name=R.SHT_NAME.RECETTE)
-            # img_path = "assets/recipes/Tranches de potimarron croustillantes et crème aigre.png"
-            recipes.append({
-                'id': it['id'],
-                'name': it['name'],
-                'img_url': 'http://127.0.0.1:5001/recipe/image/?name=Tranches de potimarron croustillantes et crème aigre.png',
-            })
-    return { 'data': recipes }, 200
-
-@recipe_bp.route("/recipe/image/")
-def recipe_get_image():
-    name = request.args.get("name")
-    return send_file(path_or_file='../../assets/recipes/' + name, mimetype='image/gif')
+@recipe_bp.route("/recipe/image/<file_id>")
+def recipe_get_image(file_id):
+    query = Recipe.select().where(Recipe.file_id == file_id)
+    for q in query:
+        path = '../../' + q.img_path
+        break
+    return send_file(path_or_file=path, mimetype='image/gif')
