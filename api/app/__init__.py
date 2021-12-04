@@ -75,11 +75,13 @@ application.register_blueprint(recipe_bp)
 
 ##### DATABASE CONFIG #####
 from app.models.transaction import Transaction
+from app.models.recipe import Recipe
 
 def create_tables():
     with database:
         database.create_tables([
             Transaction,
+            Recipe,
         ])
 
 create_tables()

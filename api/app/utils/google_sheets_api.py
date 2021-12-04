@@ -311,7 +311,7 @@ class GoogleSheetsApi:
 
 
     def list_files(self, folder_id):
-        q = "'" + folder_id + "' in parents"
+        q = "'" + folder_id + "' in parents and trashed = false"
         result = self.drive_service.files().list(
             q = q,
             pageSize=10, fields="nextPageToken, files(id, name, mimeType)").execute()

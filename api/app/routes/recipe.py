@@ -4,6 +4,19 @@ from flask_cors import CORS
 
 from app import gsheet
 
+class Recipe:
+    NB_PERSONNES    = "H9"
+    IMG_LINK        = "D4"
+    class SheetName:
+        RECETTE     = "Recette"
+        FINAL       = "Recette finale"
+    SHT_NAME = SheetName()
+    class Link:
+        RECIPES_FOLDER_ID = "1xZzpaRoEBS8Tetvb-fFGowtuKNqv8E8d"
+    LINK = Link()
+
+R = Recipe()
+
 recipe_bp = Blueprint("recipe", __name__)
 CORS(recipe_bp)
 
@@ -21,8 +34,7 @@ def download_recipe(file_id, nb):
     Returns:
         str: The download url
     """
-    sheet_name = "Recette"
-    gsheet.update_value(cell="H8", value=nb, file_id=file_id, sheet_name=sheet_name)
+    gsheet.update_value(cell=R.NB_PERSONNES, value=nb, file_id=file_id, sheet_name=R.SHT_NAME.RECETTE)
 
     url = "https://docs.google.com/spreadsheets/d/" + file_id + "/export" + \
         "?format=pdf" + \
@@ -32,6 +44,7 @@ def download_recipe(file_id, nb):
         "&gid=1169815886"
     
     return url, 200
+
 
 @recipe_bp.route("/recipe/list")
 def recipe_list():
@@ -43,12 +56,37 @@ def recipe_list():
     Returns:
         list(dict): A list of all recipe and id (eg. [{name: "<nom>", "id": "<id>"}])
     """
-    items = gsheet.list_files("1xZzpaRoEBS8Tetvb-fFGowtuKNqv8E8d")
+    items = gsheet.list_files(R.LINK.RECIPES_FOLDER_ID)
     recipes = []
     for it in items:
         if it['mimeType'] == 'application/vnd.google-apps.spreadsheet':
             recipes.append({
                 'id': it['id'],
                 'name': it['name'],
+            })
+    return { 'data': recipes }, 200
+
+
+@recipe_bp.route("/recipe/list_with_image")
+def recipe_list_with_image():
+    """
+    Get the list of recipes with coresponding images
+
+    Parameters:
+
+    Returns:
+        list(dict): A list of all recipe and id (eg. [{name: "<nom>", "id": "<id>", "img": "<img>"}])
+    """
+    items = gsheet.list_files(R.LINK.RECIPES_FOLDER_ID)
+    recipes = []
+    for it in items:
+        if it['mimeType'] == 'application/vnd.google-apps.spreadsheet':
+            # img = gsheet.get_cell(cell=R.IMG_LINK, file_id=it['id'], sheet_name=R.SHT_NAME.RECETTE)
+            # img_path = "assets/recipes/Tranches de potimarron croustillantes et crème aigre.png"
+            img_path = "assets/recipes/tranche.png"
+            recipes.append({
+                'id': it['id'],
+                'name': it['name'],
+                'img_path': img_path,
             })
     return { 'data': recipes }, 200

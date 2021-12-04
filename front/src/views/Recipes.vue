@@ -3,6 +3,8 @@
     <input v-model="nb_people_recipe" placeholder="edit me" type="number">
     <div class="recipe_buttons" v-for="(recipe, idx) in recipes" :key="idx">
       <button v-on:click="download_recipe(recipe.id, nb_people_recipe)">{{ recipe.name }}</button>
+      <!-- <img src="@/assets/recipes/tranche.png"/> -->
+      <img :src="require(recipe.img)"/>
     </div>
   </div>
 </template>
@@ -15,6 +17,7 @@ export default {
   components: {
   },
   data () {
+    require('../assets/recipes/tranche.png')
     return {
       recipes: null,
       nb_people_recipe: 4,
@@ -22,9 +25,14 @@ export default {
   },
   mounted () {
     axios
-      .get(this.$store.state.api_url + '/recipe/list')
+      .get(this.$store.state.api_url + '/recipe/list_with_image')
       .then(response => {
         this.recipes = response.data.data
+
+          for (var i = 0; i < this.recipes.length; i++) {
+            this.recipes[i].img = '@/' + this.recipes[i].img_path
+            // this.recipes[i].img = 'recipes/tranche.png'
+          }
       })
   },
   methods: {
