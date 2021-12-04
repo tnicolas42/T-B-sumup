@@ -1,12 +1,13 @@
 <template>
   <div>
+    <button v-on:click="reset_recipes()">Reset recipes</button>
     <button v-on:click="update_recipes()">Update recipes</button>
     <input v-model="nb_people_recipe" placeholder="edit me" type="number">
-    <div class="recipe_buttons" v-for="(recipe, idx) in recipes" :key="idx">
-      <button v-on:click="download_recipe(recipe.id, nb_people_recipe)">
-        {{ recipe.name }}
-        <img :src=recipe.img_url>
-      </button>
+    <div class="recipes">
+      <div class="recipe-card" v-on:click="download_recipe(recipe.id, nb_people_recipe)" v-for="(recipe, idx) in recipes" :key="idx">
+        <img class="recipe-image" :src=recipe.img_url>
+        <p class="recipe-info">{{ recipe.name }}</p>
+      </div>
     </div>
   </div>
 </template>
@@ -53,6 +54,14 @@ export default {
         .catch(error => {
           console.log("update recipe: ERROR")
         })
+    },
+    reset_recipes: function () {
+      console.log("reset recipes")
+      axios
+        .get(this.$store.state.api_url + '/recipe/reset')
+        .then(response => {
+          this.update_recipes()
+        })
     }
   }
 }
@@ -75,5 +84,38 @@ export default {
   font-size: 16px;
   border-radius: 12px;
   margin: 2px;
+}
+
+.recipes {
+  display: flex;
+  /* flex-direction: row; */
+  flex-wrap: wrap;
+  justify-content: start;
+  align-content: flex-start;
+}
+
+.recipe-card {
+  display: flex;
+  flex-direction: column;
+  /* position: relative; */
+  /* text-align: center; */
+  /* max-width: 200; */
+  /* max-height: 200; */
+  padding: 2%;
+  flex-basis: 16%;
+
+  display: flex;
+}
+
+.recipe-image {
+  max-width: 100%;
+}
+
+.recipe-info {
+  /* position: absolute;
+  bottom: 0%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white; */
 }
 </style>

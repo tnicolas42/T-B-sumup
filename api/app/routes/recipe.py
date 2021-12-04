@@ -47,21 +47,44 @@ def download_recipe(file_id, nb):
     return url, 200
 
 
+@recipe_bp.route("/recipe/reset")
+def recipe_reset():
+    """
+    Remove all recipe from database
+    """
+    Recipe.delete().execute()
+    return "OK", 200
+
+
 @recipe_bp.route("/recipe/fetch")
 def recipe_fetch():
+    """
+    Fetch all new recipes
+    """
     items = gsheet.list_files(R.LINK.RECIPES_FOLDER_ID)
-    Recipe.delete().execute()
-    for it in items:
+    for i, it in enumerate(items):
         if it['mimeType'] == 'application/vnd.google-apps.spreadsheet':
-            img_link = gsheet.get_cell(cell=R.IMG_LINK, file_id=it['id'], sheet_name=R.SHT_NAME.RECETTE)
-            img_path = 'assets/recipes/' + it['id'] + '.png'
-            gsheet.download_file(file_id=img_link, dest='../' + img_path)
-            Recipe.create(
-                name=it['name'],
-                file_id=it['id'],
-                img_id=img_link,
-                img_path=img_path,
-            )
+            print("[%3d%%] %s" % (int(float(i) / len(items) * 100), it['name']))
+            recipe = None
+            query = Recipe.select().where(Recipe.file_id == it['id'])
+            for q in query:
+                recipe = q
+                break
+            if not recipe:  # if recipe already exist
+                recipe = Recipe.create(
+                    name="",
+                    file_id=it['id'],
+                    img_id="",
+                    img_path="",
+                )
+            recipe.name = it['name']
+            img_id = gsheet.get_cell(cell=R.IMG_LINK, file_id=it['id'], sheet_name=R.SHT_NAME.RECETTE)
+            if recipe.img_id != img_id:
+                img_path = 'assets/recipes/' + it['id'] + '.png'
+                gsheet.download_file(file_id=img_id, dest='../' + img_path)
+                recipe.img_id = img_id
+                recipe.img_path = img_path
+            recipe.save()
     return "OK", 200
 
 
