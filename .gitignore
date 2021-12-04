@@ -135,3 +135,4 @@ venv
 
 api/token.json
 api/credentials.json
+assets/recipes/*.png
