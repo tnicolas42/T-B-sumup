@@ -99,7 +99,7 @@ def recipe_list():
         list(dict): A list of all recipe and id (eg. [{name: "<nom>", "id": "<id>"}])
     """
     recipes = []
-    query = Recipe.select()
+    query = Recipe.select().order_by(Recipe.name)
     for q in query:
         recipes.append({
             'id': q.file_id,
