@@ -1,9 +1,11 @@
+import json
+
 from flask import Blueprint
 from flask import send_file, request
 from flask_cors import CORS
 
 from app import gsheet, RUNNING_PORT
-from app.models.recipe import ALLERGENE_LIST, Recipe
+from app.models.recipe import ALLERGENE_LIST, SIMPLE_ALLERGENE_LIST, Recipe
 from app.utils.recipe import recipe_search
 from app.utils.utils import get_simple_string
 
@@ -81,6 +83,7 @@ def recipe_fetch():
                     file_id=it['id'],
                     img_id="",
                     img_path="",
+                    allergene="",
                     search_name="",
                     search_ingredients="",
                     search_etapes="",
@@ -94,15 +97,16 @@ def recipe_fetch():
                 sheet_name=R.SHT_NAME.FINAL)
             recipe.search_ingredients = get_simple_string(content[0])
             recipe.search_etapes = get_simple_string(content[1])
-            allergene = get_simple_string(gsheet.get_cell(
+            allergene = gsheet.get_cell(
                 cell=R.ALLERGENE,
                 file_id=it['id'],
-                sheet_name=R.SHT_NAME.RECETTE))
-            allergene = [al.strip() for al in allergene.split(',')]
+                sheet_name=R.SHT_NAME.RECETTE)
+            recipe.allergene = allergene
+            allergene = [al.strip() for al in get_simple_string(allergene).split(',')]
             for al in allergene:
-                if al not in ALLERGENE_LIST:
+                if al not in SIMPLE_ALLERGENE_LIST:
                     print("INVALID ALLERGENE: " + al + "(in " + it['name'] + ")")
-            recipe.search_allergene = str(allergene)
+            recipe.search_allergene = json.dumps(str(allergene))
             img_id = gsheet.get_cell(cell=R.IMG_LINK, file_id=it['id'], sheet_name=R.SHT_NAME.RECETTE)
             if recipe.img_id != img_id:
                 img_path = 'assets/recipes/' + it['id'] + '.png'
@@ -135,6 +139,7 @@ def recipe_list():
         recipes.append({
             'id': q.file_id,
             'name': q.name,
+            'allergene': q.allergene
         })
     return { 'data': recipes }, 200
 
@@ -146,3 +151,7 @@ def recipe_get_image(file_id):
         path = '../../' + q.img_path
         break
     return send_file(path_or_file=path, mimetype='image/gif')
+
+@recipe_bp.route("/recipe/allergenic_list")
+def get_allergenic_list():
+    return { 'data': ALLERGENE_LIST }

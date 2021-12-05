@@ -5,27 +5,29 @@ from playhouse.shortcuts import model_to_dict
 from app.utils.utils import get_simple_string
 
 ALLERGENE_LIST = [
-    get_simple_string("Gluten"),
-    get_simple_string("Oeufs"),
-    get_simple_string("Lactose"),
-    get_simple_string("Fruits à coque"),
-    get_simple_string("Arachides"),
-    get_simple_string("Moutarde"),
-    get_simple_string("Soja"),
-    get_simple_string("Sulfites"),
-    get_simple_string("Sésame"),
-    get_simple_string("Poissons"),
-    get_simple_string("Crustacés"),
-    get_simple_string("Mollusques"),
-    get_simple_string("Céleri"),
-    get_simple_string("Lupins"),
+    "Gluten",
+    "Oeufs",
+    "Lactose",
+    "Fruits à coque",
+    "Arachides",
+    "Moutarde",
+    "Soja",
+    "Sulfites",
+    "Sésame",
+    "Poissons",
+    "Crustacés",
+    "Mollusques",
+    "Céleri",
+    "Lupins",
 ]
+SIMPLE_ALLERGENE_LIST = [ get_simple_string(s) for s in ALLERGENE_LIST ]
 
 class Recipe(BaseModel):
     name = CharField()  # name of the recipe
     file_id = CharField()  # id of the recipe file
     img_id = CharField()  # google drive link to image
     img_path = CharField()  # image path
+    allergene = CharField()
 
     # search parameters
     search_name = CharField()

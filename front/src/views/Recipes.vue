@@ -13,6 +13,12 @@
         <p>Only on name</p>
       </div>
     </div>
+    <div id="allergenic-box">
+      <div v-for="(allergenic, idx) in allergenic_list" :key="idx" class="checkbox-text">
+        <input type="checkbox" v-model="allergenic[1]" v-on:click="search_recipes(search_string, !search_only_on_name)"/>
+        <p>{{ allergenic[0] }}</p>
+      </div>
+    </div>
     <div class="recipes">
       <div class="recipe-card" v-for="(recipe, idx) in recipes" :key="idx">
         <div class="recipe-image" v-bind:style="{ backgroundImage: 'url(' + recipe.img_url + ')' }">
@@ -38,13 +44,22 @@ export default {
   data () {
     return {
       recipes: null,
-      // nb_people_recipe: 4,
       search_string: "",
       search_only_on_name: false,
+      allergenic_list: null,
     }
   },
   mounted () {
     this.search_recipes("")
+    axios
+      .get(this.$store.state.api_url + "/recipe/allergenic_list")
+      .then(response => {
+        var allergenic_list = []
+        for (const elem in response.data.data) {
+          allergenic_list.push([ response.data.data[elem], false ])
+        }
+        this.allergenic_list = allergenic_list
+      })
   },
   methods: {
     download_recipe: function(file_id, nb) {
@@ -194,5 +209,11 @@ export default {
 	margin-top: 0px;
 	margin-bottom: 0px;
 	margin-left: 5px;
+}
+
+#allergenic-box {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 </style>
