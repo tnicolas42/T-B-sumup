@@ -2,6 +2,24 @@ from peewee import CharField, TextField
 from app.models import BaseModel
 from peewee import CharField
 from playhouse.shortcuts import model_to_dict
+from app.utils.utils import get_simple_string
+
+ALLERGENE_LIST = [
+    get_simple_string("Gluten"),
+    get_simple_string("Oeufs"),
+    get_simple_string("Lactose"),
+    get_simple_string("Fruits à coque"),
+    get_simple_string("Arachides"),
+    get_simple_string("Moutarde"),
+    get_simple_string("Soja"),
+    get_simple_string("Sulfites"),
+    get_simple_string("Sésame"),
+    get_simple_string("Poissons"),
+    get_simple_string("Crustacés"),
+    get_simple_string("Mollusques"),
+    get_simple_string("Céleri"),
+    get_simple_string("Lupins"),
+]
 
 class Recipe(BaseModel):
     name = CharField()  # name of the recipe
@@ -13,6 +31,7 @@ class Recipe(BaseModel):
     search_name = CharField()
     search_ingredients = TextField()
     search_etapes = TextField()
+    search_allergene = TextField()
 
     def to_dict(self, exclude=None, include=None):
         """
