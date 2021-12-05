@@ -15,8 +15,9 @@
     </div>
     <div class="recipes">
       <div class="recipe-card" v-for="(recipe, idx) in recipes" :key="idx">
-        <img class="recipe-image" :src=recipe.img_url>
-        <p class="recipe-info">{{ recipe.name }}</p>
+        <div class="recipe-image" v-bind:style="{ backgroundImage: 'url(' + recipe.img_url + ')' }">
+          <div class="recipe-name">{{ recipe.name }}</div>
+        </div>
         <div class="icons">
           <img src="@/assets/icons/google_sheets.png" v-on:click="open_recipe(recipe.id)">
           <input v-model="recipe.nb_people_recipe" placeholder="edit me" type="number">
@@ -114,45 +115,74 @@ export default {
 
 .recipes {
   display: flex;
-  /* flex-direction: row; */
   flex-wrap: wrap;
-  justify-content: flex-start;
-  align-content: flex-start;
+  justify-content: center;
+  align-content: center;
 }
 
 .recipe-card {
   display: flex;
   flex-direction: column;
-  /* position: relative; */
-  /* text-align: center; */
-  /* max-width: 200; */
-  /* max-height: 200; */
-  padding: 2%;
-  flex-basis: 15%;
-
+  /* margin: 2%;
+  padding: 1%;
+  flex-basis: 15%; */
+  margin: 1%;
+  padding: 1%;
+  width: 200px;
+  height: 240px;
   display: flex;
+  background-color: rgba(255, 255, 255, 0.144);
+  /* background-color: rgba(255, 248, 248, 0.56); */
+}
+.recipe-card:hover {
+  background-color: rgba(190, 190, 190, 0.445);
 }
 
 .recipe-image {
-  max-width: 100%;
+  min-height: 200px;
+  min-width: 200px;
+  background-position: 50% 50%;
+  background-size: cover;
+  /* justify-content: flex-end; */
+  align-content: flex-end;
+  /* align-items: flex-end; */
 }
 
-.recipe-info {
-  /* position: absolute;
-  bottom: 0%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white; */
+.recipe-name {
+  color: #000;
+  display: flex;
+  min-height: 15%;
+  min-width: 100%;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+  flex: 0 auto;
+  border-radius: 0px;
+  background-color: rgba(255, 248, 248, 0.56);
+  font-size: 15px;
+  line-height: 15px;
 }
 
 .icons {
   display: flex;
   flex-direction: row;
   justify-content: space-around;
+  align-items: center;
+  margin-top: 5px;
+  height: 40px;
 }
-
+.icons>input {
+  width: 100px;
+  height: 18px;
+}
 .icons>img {
-  max-width: 10%;
+  max-width: 30px;
+  max-height: 30px;
+}
+.icons>img:hover {
+  max-width: 40px;
+  max-height: 40px;
 }
 
 #search-box {
