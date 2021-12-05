@@ -1,8 +1,18 @@
 <template>
   <div>
-    <button v-on:click="reset_recipes()">Reset recipes</button>
-    <button v-on:click="update_recipes()">Update recipes</button>
-    <input v-model="nb_people_recipe" placeholder="edit me" type="number">
+    <div>
+      <button v-on:click="reset_recipes()">Reset recipes</button>
+      <button v-on:click="update_recipes()">Update recipes</button>
+      <input v-model="nb_people_recipe" placeholder="edit me" type="number">
+    </div>
+    <div id="search-box">
+      <input v-model="search_string" placeholder="search..." type="string" v-on:keyup="search_recipes(search_string, search_only_on_name)">
+      <!-- <button v-on:click="search_recipes(search_string, search_only_on_name)">Search</button> -->
+      <div class="checkbox-text">
+        <input type="checkbox" v-model="search_only_on_name" v-on:click="search_recipes(search_string, !search_only_on_name)"/>
+        <p>Only on name</p>
+      </div>
+    </div>
     <div class="recipes">
       <div class="recipe-card" v-on:click="download_recipe(recipe.id, nb_people_recipe)" v-for="(recipe, idx) in recipes" :key="idx">
         <img class="recipe-image" :src=recipe.img_url>
@@ -23,17 +33,12 @@ export default {
     return {
       recipes: null,
       nb_people_recipe: 4,
+      search_string: "",
+      search_only_on_name: false,
     }
   },
   mounted () {
-    axios
-      .get(this.$store.state.api_url + '/recipe/list')
-      .then(response => {
-        this.recipes = response.data.data
-        for (var i = 0; i < this.recipes.length; i++) {
-          this.recipes[i].img_url = this.$store.state.api_url + '/recipe/image/' + this.recipes[i].id
-        }
-      })
+    this.search_recipes("")
   },
   methods: {
     download_recipe: function(file_id, nb) {
@@ -61,6 +66,18 @@ export default {
         .get(this.$store.state.api_url + '/recipe/reset')
         .then(response => {
           this.update_recipes()
+        })
+    },
+    search_recipes: function (searchstr, onlyname=false) {
+      console.log("search repices")
+      axios
+        .get(this.$store.state.api_url + '/recipe/list?search=' + searchstr + '&only_name=' + onlyname)
+        .then(response => {
+          this.recipes = response.data.data
+          console.log(this.recipes)
+          for (var i = 0; i < this.recipes.length; i++) {
+            this.recipes[i].img_url = this.$store.state.api_url + '/recipe/image/' + this.recipes[i].id
+          }
         })
     }
   }
@@ -90,7 +107,7 @@ export default {
   display: flex;
   /* flex-direction: row; */
   flex-wrap: wrap;
-  justify-content: start;
+  justify-content: flex-start;
   align-content: flex-start;
 }
 
@@ -102,7 +119,7 @@ export default {
   /* max-width: 200; */
   /* max-height: 200; */
   padding: 2%;
-  flex-basis: 16%;
+  flex-basis: 15%;
 
   display: flex;
 }
@@ -117,5 +134,22 @@ export default {
   left: 50%;
   transform: translate(-50%, -50%);
   color: white; */
+}
+
+#search-box {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin: 10px;
+}
+
+.checkbox-text {
+	display: flex;
+	flex-direction: row;
+}
+.checkbox-text>p {
+	margin-top: 0px;
+	margin-bottom: 0px;
+	margin-left: 5px;
 }
 </style>

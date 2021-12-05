@@ -1,13 +1,18 @@
+from posixpath import join
 from flask import Blueprint
 from flask import send_file, request
 from flask_cors import CORS
+from peewee import fn
 
 from app import gsheet, RUNNING_PORT
 from app.models.recipe import Recipe
+from app.utils.utils import get_simple_string
 
 class RecipeInfo:
     NB_PERSONNES    = "H9"
     IMG_LINK        = "D4"
+    INGREDIENT      = "C9"
+    ETAPES          = "C13"
     class SheetName:
         RECETTE     = "Recette"
         FINAL       = "Recette finale"
@@ -76,8 +81,18 @@ def recipe_fetch():
                     file_id=it['id'],
                     img_id="",
                     img_path="",
+                    search_name="",
+                    search_ingredients="",
+                    search_etapes="",
                 )
             recipe.name = it['name']
+            recipe.search_name = get_simple_string(it['name'])
+            content = gsheet.batch_get_cell(
+                cells=[R.INGREDIENT, R.ETAPES],
+                file_id=it['id'],
+                sheet_name=R.SHT_NAME.FINAL)
+            recipe.search_ingredients = get_simple_string(content[0])
+            recipe.search_etapes = get_simple_string(content[1])
             img_id = gsheet.get_cell(cell=R.IMG_LINK, file_id=it['id'], sheet_name=R.SHT_NAME.RECETTE)
             if recipe.img_id != img_id:
                 img_path = 'assets/recipes/' + it['id'] + '.png'
@@ -85,21 +100,41 @@ def recipe_fetch():
                 recipe.img_id = img_id
                 recipe.img_path = img_path
             recipe.save()
+    print("[100%] Done !")
     return "OK", 200
 
-
+from peewee import JOIN
 @recipe_bp.route("/recipe/list")
 def recipe_list():
     """
     Get the list of recipes
 
     Parameters:
+        ?search=... (str): The words to search.
+        ?only_name=true/false (bool): Search only on name or in content
 
     Returns:
         list(dict): A list of all recipe and id (eg. [{name: "<nom>", "id": "<id>"}])
     """
+    query = None
+    search = request.args.get("search", None)
+    only_name = request.args.get("only_name", False, type=lambda v: v.lower() == 'true')
+    if search is not None:
+        search = get_simple_string(search)
+        if only_name:
+            query = Recipe.select().where(
+                Recipe.search_name.contains(search)
+                ).order_by(Recipe.name)
+        else:
+            query = Recipe.select().where(
+                Recipe.search_name.contains(search) |
+                Recipe.search_ingredients.contains(search) |
+                Recipe.search_etapes.contains(search)
+                ).order_by(Recipe.name)
+
+    if query is None:
+        query = Recipe.select().order_by(Recipe.name)
     recipes = []
-    query = Recipe.select().order_by(Recipe.name)
     for q in query:
         recipes.append({
             'id': q.file_id,

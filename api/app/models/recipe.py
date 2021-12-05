@@ -1,4 +1,4 @@
-from peewee import CharField
+from peewee import CharField, TextField
 from app.models import BaseModel
 from peewee import CharField
 from playhouse.shortcuts import model_to_dict
@@ -8,6 +8,11 @@ class Recipe(BaseModel):
     file_id = CharField()  # id of the recipe file
     img_id = CharField()  # google drive link to image
     img_path = CharField()  # image path
+
+    # search parameters
+    search_name = CharField()
+    search_ingredients = TextField()
+    search_etapes = TextField()
 
     def to_dict(self, exclude=None, include=None):
         """

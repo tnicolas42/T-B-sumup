@@ -314,10 +314,19 @@ class GoogleSheetsApi:
 
     def list_files(self, folder_id):
         q = "'" + folder_id + "' in parents and trashed = false"
-        result = self.drive_service.files().list(
-            q = q,
-            pageSize=10, fields="nextPageToken, files(id, name, mimeType)").execute()
-        items = result.get('files', [])
+        page_token = None
+        items = []
+        while True:
+            response = self.drive_service.files().list(
+                q = q,
+                pageSize=10,
+                fields="nextPageToken, files(id, name, mimeType)",
+                pageToken=page_token,
+                ).execute()
+            items = [*items, *response.get('files', [])]
+            page_token = response.get('nextPageToken', None)
+            if page_token is None:
+                break
         return items
 
 
