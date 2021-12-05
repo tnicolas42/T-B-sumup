@@ -116,23 +116,19 @@ export default {
 .recipes {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   align-content: center;
 }
 
 .recipe-card {
   display: flex;
   flex-direction: column;
-  /* margin: 2%;
-  padding: 1%;
-  flex-basis: 15%; */
   margin: 1%;
-  padding: 1%;
+  padding: 0.5%;
   width: 200px;
   height: 240px;
   display: flex;
   background-color: rgba(255, 255, 255, 0.144);
-  /* background-color: rgba(255, 248, 248, 0.56); */
 }
 .recipe-card:hover {
   background-color: rgba(190, 190, 190, 0.445);
@@ -143,9 +139,7 @@ export default {
   min-width: 200px;
   background-position: 50% 50%;
   background-size: cover;
-  /* justify-content: flex-end; */
   align-content: flex-end;
-  /* align-items: flex-end; */
 }
 
 .recipe-name {
@@ -181,8 +175,8 @@ export default {
   max-height: 30px;
 }
 .icons>img:hover {
-  max-width: 40px;
-  max-height: 40px;
+  max-width: 35px;
+  max-height: 35px;
 }
 
 #search-box {
