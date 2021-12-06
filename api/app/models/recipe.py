@@ -22,12 +22,22 @@ ALLERGENE_LIST = [
 ]
 SIMPLE_ALLERGENE_LIST = [ get_simple_string(s) for s in ALLERGENE_LIST ]
 
+class RecipeCategorie:
+    cat_list = [
+        "Food truck",
+        "Autres",
+    ]
+    FOOD_TRUCK = cat_list[0]
+    AUTRES = cat_list[1]
+RECIPE_CATEGORIE = RecipeCategorie()
+
 class Recipe(BaseModel):
     name = CharField()  # name of the recipe
     file_id = CharField()  # id of the recipe file
     img_id = CharField()  # google drive link to image
     img_path = CharField()  # image path
-    allergene = CharField()
+    allergene = CharField()  # recipe allegenic
+    categorie = CharField()  # recipe categorie
 
     # search parameters
     search_name = CharField()

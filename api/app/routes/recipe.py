@@ -1,29 +1,11 @@
-import json
-
 from flask import Blueprint
 from flask import send_file, request
 from flask_cors import CORS
 
-from app import gsheet, RUNNING_PORT
-from app.models.recipe import ALLERGENE_LIST, SIMPLE_ALLERGENE_LIST, Recipe
-from app.utils.recipe import recipe_search
-from app.utils.utils import get_simple_string
-
-class RecipeInfo:
-    NB_PERSONNES    = "H9"
-    IMG_LINK        = "D4"
-    INGREDIENT      = "C9"
-    ETAPES          = "C13"
-    ALLERGENE       = "D5"
-    class SheetName:
-        RECETTE     = "Recette"
-        FINAL       = "Recette finale"
-    SHT_NAME = SheetName()
-    class Link:
-        RECIPES_FOLDER_ID = "1xZzpaRoEBS8Tetvb-fFGowtuKNqv8E8d"
-    LINK = Link()
-
-R = RecipeInfo()
+from app import gsheet
+from app.models.recipe import ALLERGENE_LIST, RECIPE_CATEGORIE, Recipe
+from app.utils.recipe import recipe_fetch, recipe_search
+from app.utils.recipe import R
 
 recipe_bp = Blueprint("recipe", __name__)
 CORS(recipe_bp)
@@ -64,57 +46,17 @@ def recipe_reset():
 
 
 @recipe_bp.route("/recipe/fetch")
-def recipe_fetch():
+def recipe_fetch_route():
     """
     Fetch all new recipes
     """
-    items = gsheet.list_files(R.LINK.RECIPES_FOLDER_ID)
-    for i, it in enumerate(items):
-        if it['mimeType'] == 'application/vnd.google-apps.spreadsheet':
-            print("[%3d%%] %s" % (int(float(i) / len(items) * 100), it['name']))
-            recipe = None
-            query = Recipe.select().where(Recipe.file_id == it['id'])
-            for q in query:
-                recipe = q
-                break
-            if not recipe:  # if recipe already exist
-                recipe = Recipe.create(
-                    name="",
-                    file_id=it['id'],
-                    img_id="",
-                    img_path="",
-                    allergene="",
-                    search_name="",
-                    search_ingredients="",
-                    search_etapes="",
-                    search_allergene="",
-                )
-            recipe.name = it['name']
-            recipe.search_name = get_simple_string(it['name'])
-            content = gsheet.batch_get_cell(
-                cells=[R.INGREDIENT, R.ETAPES],
-                file_id=it['id'],
-                sheet_name=R.SHT_NAME.FINAL)
-            recipe.search_ingredients = get_simple_string(content[0])
-            recipe.search_etapes = get_simple_string(content[1])
-            allergene = gsheet.get_cell(
-                cell=R.ALLERGENE,
-                file_id=it['id'],
-                sheet_name=R.SHT_NAME.RECETTE)
-            recipe.allergene = allergene
-            allergene = [al.strip() for al in get_simple_string(allergene).split(',')]
-            for al in allergene:
-                if al not in SIMPLE_ALLERGENE_LIST:
-                    print("INVALID ALLERGENE: " + al + "(in " + it['name'] + ")")
-            recipe.search_allergene = json.dumps(str(allergene))
-            img_id = gsheet.get_cell(cell=R.IMG_LINK, file_id=it['id'], sheet_name=R.SHT_NAME.RECETTE)
-            if recipe.img_id != img_id:
-                img_path = 'assets/recipes/' + it['id'] + '.png'
-                gsheet.download_file(file_id=img_id, dest='../' + img_path)
-                recipe.img_id = img_id
-                recipe.img_path = img_path
-            recipe.save()
-    print("[100%] Done !")
+    only_new = request.args.get("only_new", False)
+    print("Fectching food truck recipes")
+    return_1 = recipe_fetch(R.LINK.RECIPES_FOLDER_ID, RECIPE_CATEGORIE.FOOD_TRUCK, only_new=only_new)
+    print("Fectching simple recipes")
+    return_2 = recipe_fetch(R.LINK.RECIPES_OTHER_FOLDER_ID, RECIPE_CATEGORIE.AUTRES, only_new=only_new)
+    if not return_1 or not return_2:
+        return "ERROR", 500
     return "OK", 200
 
 from peewee import JOIN

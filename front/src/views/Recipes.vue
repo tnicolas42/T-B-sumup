@@ -1,9 +1,12 @@
 <template>
   <div>
-    <div>
+    <div id="update-box">
       <button v-on:click="reset_recipes()">Reset recipes</button>
       <button v-on:click="update_recipes()">Update recipes</button>
-      <!-- <input v-model="nb_people_recipe" placeholder="edit me" type="number"> -->
+      <div class="checkbox-text">
+        <input type="checkbox" v-model="updae_only_new"/>
+        <p>Check only for new recipe (otherwise, update all recipes)</p>
+      </div>
     </div>
     <div id="search-box">
       <input v-model="search_string" placeholder="search..." type="string" v-on:keyup="search_recipes(search_string, search_only_on_name)">
@@ -44,6 +47,7 @@ export default {
   data () {
     return {
       recipes: null,
+      update_only_new: true,
       search_string: "",
       search_only_on_name: false,
       allergenic_list: null,
@@ -76,7 +80,7 @@ export default {
     update_recipes: function () {
       console.log("update recipes")
       axios
-        .get(this.$store.state.api_url + '/recipe/fetch')
+        .get(this.$store.state.api_url + '/recipe/fetch?only_new=' + this.update_only_new)
         .then(response => {
           console.log("update recipe: OK")
         })
@@ -194,6 +198,12 @@ export default {
   max-height: 35px;
 }
 
+#update-box {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin: 10px;
+}
 #search-box {
   display: flex;
   flex-direction: row;
