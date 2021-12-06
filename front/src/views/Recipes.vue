@@ -4,7 +4,7 @@
       <button v-on:click="reset_recipes()">Reset recipes</button>
       <button v-on:click="update_recipes()">Update recipes</button>
       <div class="checkbox-text">
-        <input type="checkbox" v-model="updae_only_new"/>
+        <input type="checkbox" v-model="update_only_new"/>
         <p>Check only for new recipe (otherwise, update all recipes)</p>
       </div>
     </div>
@@ -25,7 +25,7 @@
     <div class="recipes">
       <div class="recipe-card" v-for="(recipe, idx) in recipes" :key="idx">
         <div class="recipe-image" v-bind:style="{ backgroundImage: 'url(' + recipe.img_url + ')' }">
-          <div class="recipe-name">{{ recipe.name }}</div>
+          <div class="recipe-name"><b>{{ recipe.name }}</b></div>
         </div>
         <div class="icons">
           <img src="@/assets/icons/google_sheets.png" v-on:click="open_recipe(recipe.id)">
@@ -172,7 +172,7 @@ export default {
   align-self: center;
   flex: 0 auto;
   border-radius: 0px;
-  background-color: rgba(255, 248, 248, 0.56);
+  background-color: rgb(193 193 193 / 56%);
   font-size: 15px;
   line-height: 15px;
 }
