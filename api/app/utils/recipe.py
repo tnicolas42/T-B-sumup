@@ -23,7 +23,7 @@ class RecipeInfo:
 
 R = RecipeInfo()
 
-def recipe_search(search=None, only_name=False):
+def recipe_search(search=None, only_name=False, categorie='All', allergenic=[]):
     """
     Search for words in recipe
 
@@ -35,6 +35,11 @@ def recipe_search(search=None, only_name=False):
         peewee.ModelSelect: The query with the result
     """
     query = Recipe.select()
+    if categorie != 'All':
+        query = query.where(Recipe.categorie == categorie)
+    if len(allergenic) > 0:
+        for al in allergenic:
+            query = query.where(~Recipe.allergene.contains(al))
     if search is not None:
         search = get_simple_string(search)
 

@@ -59,7 +59,7 @@ def recipe_fetch_route():
         return "ERROR", 500
     return "OK", 200
 
-from peewee import JOIN
+
 @recipe_bp.route("/recipe/list")
 def recipe_list():
     """
@@ -68,6 +68,7 @@ def recipe_list():
     Parameters:
         ?search=... (str): The words to search.
         ?only_name=true/false (bool): Search only on name or in content
+        ?categorie=... (str): Search only on a categorie ('All' for all categories)
 
     Returns:
         list(dict): A list of all recipe and id (eg. [{name: "<nom>", "id": "<id>"}])
@@ -75,7 +76,17 @@ def recipe_list():
     query = None
     search = request.args.get("search", None)
     only_name = request.args.get("only_name", False, type=lambda v: v.lower() == 'true')
-    query = recipe_search(search, only_name)
+    categorie = request.args.get("categorie", 'All')
+    allergenic = request.args.get("allergenic", '')
+    if allergenic == '':
+        allergenic = []
+    else:
+        allergenic = allergenic.split('.')
+    query = recipe_search(
+        search=search,
+        only_name=only_name,
+        categorie=categorie,
+        allergenic=allergenic)
     recipes = []
     for q in query:
         recipes.append({
@@ -97,3 +108,7 @@ def recipe_get_image(file_id):
 @recipe_bp.route("/recipe/allergenic_list")
 def get_allergenic_list():
     return { 'data': ALLERGENE_LIST }
+
+@recipe_bp.route("/recipe/categorie_list")
+def get_categorie_list():
+    return { 'data': RECIPE_CATEGORIE.cat_list }

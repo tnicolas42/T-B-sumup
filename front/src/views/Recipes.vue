@@ -10,18 +10,19 @@
     </div>
     <div id="search-box">
       <input v-model="search_string" placeholder="search..." type="string" v-on:keyup="search_recipes(search_string, search_only_on_name)">
-      <!-- <button v-on:click="search_recipes(search_string, search_only_on_name)">Search</button> -->
       <div class="checkbox-text">
         <input type="checkbox" v-model="search_only_on_name" v-on:click="search_recipes(search_string, !search_only_on_name)"/>
         <p>Only on name</p>
       </div>
     </div>
-    <div id="allergenic-box">
-      <div v-for="(allergenic, idx) in allergenic_list" :key="idx" class="checkbox-text">
-        <input type="checkbox" v-model="allergenic[1]" v-on:click="search_recipes(search_string, !search_only_on_name)"/>
-        <p>{{ allergenic[0] }}</p>
-      </div>
-    </div>
+    <select v-model="chosen_categorie" @change="search_recipes(search_string, search_only_on_name)" v-if="categorie_list">
+      <option v-for="(cat, idx) in categorie_list" :key="idx">{{ cat }}</option>
+    </select>
+    <select v-model="chosen_allergenic" multiple @change="search_recipes(search_string, search_only_on_name)" v-if="allergenic_list">
+      <option v-for="(allergenic, idx) in allergenic_list" :key="idx">{{ allergenic }}</option>
+    </select>
+    <br>
+    <span>Conviens aux allergies suivantes: {{ chosen_allergenic }}</span>
     <div class="recipes">
       <div class="recipe-card" v-for="(recipe, idx) in recipes" :key="idx">
         <div class="recipe-image" v-bind:style="{ backgroundImage: 'url(' + recipe.img_url + ')' }">
@@ -51,6 +52,9 @@ export default {
       search_string: "",
       search_only_on_name: false,
       allergenic_list: null,
+      chosen_allergenic: [],
+      categorie_list: null,
+      chosen_categorie: 'All',
     }
   },
   mounted () {
@@ -58,11 +62,13 @@ export default {
     axios
       .get(this.$store.state.api_url + "/recipe/allergenic_list")
       .then(response => {
-        var allergenic_list = []
-        for (const elem in response.data.data) {
-          allergenic_list.push([ response.data.data[elem], false ])
-        }
-        this.allergenic_list = allergenic_list
+        this.allergenic_list = response.data.data
+      })
+    axios
+      .get(this.$store.state.api_url + "/recipe/categorie_list")
+      .then(response => {
+        this.categorie_list = response.data.data
+        this.categorie_list.push('All')
       })
   },
   methods: {
@@ -97,9 +103,20 @@ export default {
         })
     },
     search_recipes: function (searchstr, onlyname=false) {
-      console.log("search repices")
+      var allergenic_data = ""
+      if (this.chosen_allergenic != null) {
+        for (const al of this.chosen_allergenic) {
+          if (allergenic_data != '') {
+            allergenic_data += '.'
+          }
+          allergenic_data += al
+        }
+      }
+      console.log(allergenic_data)
+      var req = this.$store.state.api_url + '/recipe/list?search=' + searchstr + '&only_name=' + onlyname + '&categorie=' + this.chosen_categorie + '&allergenic=' + allergenic_data
+      console.log("search repices (" + req + ")")
       axios
-        .get(this.$store.state.api_url + '/recipe/list?search=' + searchstr + '&only_name=' + onlyname)
+        .get(req)
         .then(response => {
           this.recipes = response.data.data
           console.log(this.recipes)
@@ -219,11 +236,5 @@ export default {
 	margin-top: 0px;
 	margin-bottom: 0px;
 	margin-left: 5px;
-}
-
-#allergenic-box {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
 }
 </style>
