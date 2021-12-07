@@ -55,7 +55,7 @@ def recipe_search(search=None, only_name=False, categorie='All', allergenic=[]):
                     Recipe.search_etapes.contains(word)
                     )
 
-    query = query.order_by(Recipe.name)
+    query = query.order_by(-Recipe.categorie, +Recipe.name)
     
     return query
 
